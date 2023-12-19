@@ -1,5 +1,5 @@
 # Use an official Node 20.10 runtime as a parent image
-FROM node:20
+FROM node:20-slim
 
 # Install FFmpeg
 RUN apt-get update && \
