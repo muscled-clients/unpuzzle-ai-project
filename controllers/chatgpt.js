@@ -11,8 +11,17 @@ async function convertVideoToAudio(url, startTime, duration) {
     const fileNameWithoutExt = path.basename(urlParsed.pathname, path.extname(urlParsed.pathname));
     const outputDir = path.join(process.cwd(), 'public', 'temp');
     const outputPath = path.join(outputDir, fileNameWithoutExt + '.mp3');
-    const ffmpegCommand = `ffmpeg -ss ${startTime} -i "${url}" -t ${duration} -q:a 0 -map a "${outputPath}"`;
 
+    // Check if the file already exists and delete it
+    try {
+      await fs.access(outputPath);
+      await fs.unlink(outputPath);
+      console.log(`Existing file found and deleted: ${outputPath}`);
+    } catch (error) {
+      // Error is thrown if the file does not exist, which can be ignored
+    }
+
+    const ffmpegCommand = `ffmpeg -ss ${startTime} -i "${url}" -t ${duration} -q:a 0 -map a "${outputPath}"`;
     const { stdout, stderr } = await exec(ffmpegCommand);
     if (stderr) {
       console.log(`stderr: ${stderr}`);
@@ -24,6 +33,7 @@ async function convertVideoToAudio(url, startTime, duration) {
     return null;
   }
 }
+
 
 const openai = new OpenAI();
 
